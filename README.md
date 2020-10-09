@@ -1,4 +1,3 @@
-# pcd [![Build Status](https://travis-ci.org/kvannotten/pcd.svg?branch=master)](https://travis-ci.org/kvannotten/pcd)
 
 ## Philosophy
 

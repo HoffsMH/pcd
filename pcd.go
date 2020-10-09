@@ -17,6 +17,8 @@ package pcd
 
 import (
 	"bytes"
+	"time"
+	"github.com/araddon/dateparse"
 	"encoding/base64"
 	"encoding/gob"
 	"fmt"
@@ -29,7 +31,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/kvannotten/pcd/rss"
+	"github.com/hoffsmh/pcd/rss"
+	"github.com/kennygrant/sanitize"
 	"github.com/pkg/errors"
 )
 
@@ -199,7 +202,8 @@ func (e *Episode) Download(path string, writer io.Writer) error {
 	}
 
 	filename := urlpath.Base(u.Path)
-	fpath := filepath.Join(path, filename)
+	fileextension := strings.Join(strings.Split(filename, ".")[1:], ".")
+	fpath := filepath.Join(path, sanitize.BaseName(e.Date+e.Title)+"."+fileextension)
 
 	if _, err := os.Stat(fpath); !os.IsNotExist(err) {
 		return ErrFilesystemError
@@ -248,9 +252,11 @@ func parseEpisodes(content io.Reader) ([]Episode, error) {
 
 	for _, item := range feed.Channel.Items {
 
+		date, _ := dateparse.ParseAny(item.Date.Date)
+		datestring :=  date.Format(time.RFC3339)
 		episode := Episode{
 			Title: item.Title.Title,
-			Date:  item.Date.Date,
+			Date:  datestring,
 			URL:   item.Enclosure.URL,
 		}
 
